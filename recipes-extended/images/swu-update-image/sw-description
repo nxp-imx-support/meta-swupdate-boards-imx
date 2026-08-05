@@ -1,0 +1,87 @@
+software =
+{
+	version = "2.4";
+	description = "Firmware update for @@MACHINE@@";
+
+	@@MACHINE@@ = {
+		hardware-compatibility: [ "1.0", "1.2", "1.3"];
+		stable : {
+			copy1 : {
+				images: (
+					{
+						filename = "core-image-base-@@MACHINE@@.ext4";
+						sha256 = "$swupdate_get_sha256(core-image-base-@@MACHINE@@.ext4)";
+						type = "raw";
+						compressed = "zlib";
+						device = "/dev/mmcblk0p4";
+						installed-directly = true;
+					},
+					{
+						filename = "imx-boot-@@MACHINE@@-sd.bin-flash_singleboot";
+						sha256 = "$swupdate_get_sha256(imx-boot-@@MACHINE@@-sd.bin-flash_singleboot)";
+						type = "raw";
+						compressed = "zlib";
+						device = "/dev/mmcblk0";
+						offset = "32K";
+						installed-directly = true;
+					}
+				);
+				scripts: (
+					{
+						filename = "emmcsetup.lua";
+						type = "lua";
+					}
+
+				);
+				bootenv: (
+					{
+						name = "upgrade_available";
+						value = "1";
+					},
+					{
+						name = "bootslot";
+						value = "dualB";
+					}
+				);
+			}
+			copy2 : {
+				images: (
+					{
+						filename = "core-image-base-@@MACHINE@@.ext4";
+						sha256 = "$swupdate_get_sha256(core-image-base-@@MACHINE@@.ext4)";
+						type = "raw";
+						compressed = "zlib";
+						device = "/dev/mmcblk0p3";
+						installed-directly = true;
+					},
+					{
+						filename = "imx-boot-@@MACHINE@@-sd.bin-flash_singleboot";
+						sha256 = "$swupdate_get_sha256(imx-boot-@@MACHINE@@-sd.bin-flash_singleboot)";
+						type = "raw";
+						compressed = "zlib";
+						device = "/dev/mmcblk0";
+						offset = "32K";
+						installed-directly = true;
+					}
+				);
+				scripts: (
+					{
+						filename = "emmcsetup.lua";
+						type = "lua";
+					}
+
+				);
+				bootenv: (
+					{
+						name = "upgrade_available";
+						value = "1";
+					},
+					{
+						name = "bootslot";
+						value = "dualA";
+					}
+				);
+			}
+		}
+	}
+}

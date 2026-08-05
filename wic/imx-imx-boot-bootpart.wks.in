@@ -1,0 +1,39 @@
+# short-description: Create SD card image with A/B partition layout for SWUpdate OTA
+# long-description:
+# Disk layout (--align in KiB, sizes in MiB):
+#
+#  Start       Size                  Contents
+#  ---------   --------------------  -------------------------------------------
+#  0           ~8 MiB                imx-boot (raw, no partition table entry)
+#  8 MiB       42 MiB                kernel Image (raw)
+#  50 MiB      4 MiB                 DTB (raw)
+#  54 MiB      66 MiB                SWUpdate ramdisk (raw)
+#  120 MiB     256 MiB               Slot A /boot  (vfat, label boot_a)
+#  376 MiB     ROOTFS_PART_SIZE MiB  Slot A /      (ext4, label rootfs_a)
+#  376+RS MiB  256 MiB               Slot B /boot  (vfat, label boot_b)
+#  632+RS MiB  ROOTFS_PART_SIZE MiB  Slot B /      (ext4, label rootfs_b)
+#
+# RS = ROOTFS_PART_SIZE (default 1024 MiB = 1 GiB).
+#
+# Partition table type is controlled by DISK_PTABLE (default: msdos).
+# Set in local.conf or a machine conf to switch to GPT:
+#   DISK_PTABLE = "gpt"
+# Valid values: "msdos" (MBR) or "gpt".
+#
+part u-boot --source rawcopy --sourceparams="file=imx-boot.tagged" --ondisk mmcblk --no-table --align ${IMX_BOOT_SEEK}
+# 8MB ~ 50MB
+part kernel --source rawcopy --sourceparams="file=Image" --ondisk mmcblk --no-table --align 8192
+# 50MB ~ 54MB
+part dtb --source rawcopy --sourceparams="file=${KERNEL_DEVICETREE_BASENAME}.dtb" --ondisk mmcblk --no-table --align 51200
+# 54MB ~ 120MB
+part ramfs --source rawcopy --sourceparams="file=swupdate-image-${MACHINE}.rootfs.cpio.gz.u-boot" --ondisk mmcblk --no-table --align 55296
+# Slot A Boot: 120 MiB ~ 376 MiB
+part /boot_a --source bootimg-partition --ondisk mmcblk --fstype=vfat --label boot_a --active --align 122880 --fixed-size 256
+# Slot A RootFS: 376 MiB ~ (376 + ROOTFS_PART_SIZE) MiB
+part / --source rootfs --ondisk mmcblk --fstype=ext4 --label rootfs_a --align 385024 --fixed-size ${ROOTFS_PART_SIZE}
+# Slot B Boot: (376 + ROOTFS_PART_SIZE) MiB ~ (632 + ROOTFS_PART_SIZE) MiB
+part /boot_b --source bootimg-partition --ondisk mmcblk --fstype=vfat --label boot_b --active --align ${@(376 + int(d.getVar('ROOTFS_PART_SIZE'))) * 1024} --fixed-size 256
+# Slot B RootFS: (632 + ROOTFS_PART_SIZE) MiB ~ (632 + 2*ROOTFS_PART_SIZE) MiB
+part /rootfs_b --source rootfs --ondisk mmcblk --fstype=ext4 --label rootfs_b --align ${@(632 + int(d.getVar('ROOTFS_PART_SIZE'))) * 1024} --fixed-size ${ROOTFS_PART_SIZE}
+
+bootloader --ptable ${DISK_PTABLE}
