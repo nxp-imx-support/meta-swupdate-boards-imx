@@ -9,8 +9,8 @@ software =
 			copy1 : {
 				images: (
 					{
-						filename = "core-image-base-@@MACHINE@@.ext4";
-						sha256 = "$swupdate_get_sha256(core-image-base-@@MACHINE@@.ext4)";
+						filename = "@@ROOTFS_IMAGE@@-@@MACHINE@@.ext4";
+						sha256 = "$swupdate_get_sha256(@@ROOTFS_IMAGE@@-@@MACHINE@@.ext4)";
 						type = "raw";
 						compressed = "zlib";
 						device = "/dev/mmcblk0p4";
@@ -47,8 +47,8 @@ software =
 			copy2 : {
 				images: (
 					{
-						filename = "core-image-base-@@MACHINE@@.ext4";
-						sha256 = "$swupdate_get_sha256(core-image-base-@@MACHINE@@.ext4)";
+						filename = "@@ROOTFS_IMAGE@@-@@MACHINE@@.ext4";
+						sha256 = "$swupdate_get_sha256(@@ROOTFS_IMAGE@@-@@MACHINE@@.ext4)";
 						type = "raw";
 						compressed = "zlib";
 						device = "/dev/mmcblk0p3";
