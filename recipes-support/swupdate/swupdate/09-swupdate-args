@@ -2,10 +2,10 @@ rootfs=`swupdate -g`
 
 # Slot A rootfs is mmcblk0p2; running from it means we update Slot B (copy1).
 # Running from Slot B (mmcblk0p4) means we update Slot A (copy2).
-if [ "$rootfs" = '/dev/mmcblk0p4' ]; then
-	selection="-e stable,copy2"
-else
+if [ "$rootfs" = '/dev/mmcblk0p2' ]; then
 	selection="-e stable,copy1"
+else
+	selection="-e stable,copy2"
 fi
 
 state=`fw_printenv ustate | cut -f 2 -d'='`
