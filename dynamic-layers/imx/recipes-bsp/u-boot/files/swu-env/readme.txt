@@ -30,7 +30,7 @@ Board env file lookup (reads from the generated .config after do_configure):
 
 Directory layout
 ----------------
-files/swu_env/
+files/swu-env/
     readme.txt           -- this file
     env.txt              -- common variables, ALL machines (LOW priority)
     <MACHINE>/
@@ -51,19 +51,19 @@ on machine imx6ull9x9evk):
   2. Create the overlay file using the Yocto MACHINE name as directory:
        files/board-env/imx6ull9x9evk/imx6ull_evk.env
   3. Add the U-Boot environment variables needed as the board baseline.
-  4. The variables in files/swu_env/env.txt (or <MACHINE>/env.txt) will still
+  4. The variables in files/swu-env/env.txt (or <MACHINE>/env.txt) will still
      be injected on top of this overlay file as usual.
 
 Priority: MACHINE-SPECIFIC > COMMON
 -------------------------------------
-Yocto FILESEXTRAPATHS searches directories from left to right and stops at
-the first match.  FILESEXTRAPATHS:prepend is set to:
+FILESEXTRAPATHS:prepend is set to:
 
-    files/swu_env/<MACHINE>  then  files/swu_env
+    files/swu-env
 
-So the resolution of "file://env.txt" is:
-  1. files/swu_env/<MACHINE>/env.txt  (machine-specific, found first -> used)
-  2. files/swu_env/env.txt            (common fallback, used when no machine file)
+Yocto automatically searches <dir>/<MACHINE>/ before <dir>/ for each entry
+in FILESEXTRAPATHS, so the resolution of "file://env.txt" is:
+  1. files/swu-env/<MACHINE>/env.txt  (machine-specific, found first -> used)
+  2. files/swu-env/env.txt            (common fallback, used when no machine file)
 
 When a <MACHINE>/env.txt exists it completely replaces the common env.txt for
 that machine.  The two files are NOT merged.
@@ -89,7 +89,7 @@ Example (env.txt - common fallback):
     mmcargs=setenv bootargs ${jh_clk} console=${console} root=${mmcroot} cur_slot=${bootslot}
     bootslot=dualA
 
-Example (files/swu_env/imx91-11x11-lpddr4-evk/env.txt - machine-specific):
+Example (files/swu-env/imx91-11x11-lpddr4-evk/env.txt - machine-specific):
     # Machine-specific overrides (take priority over common env.txt)
     swupdate_active=a
     swupdate_inactive=b
@@ -97,10 +97,10 @@ Example (files/swu_env/imx91-11x11-lpddr4-evk/env.txt - machine-specific):
 How to add or change variables
 --------------------------------
 Common variable (applies to all machines that have no machine-specific file):
-  Edit  files/swu_env/env.txt
+  Edit  files/swu-env/env.txt
 
 Machine-specific variable (takes priority over common, replaces common entirely):
-  Create  files/swu_env/<MACHINE>/env.txt  (if it does not exist yet)
+  Create  files/swu-env/<MACHINE>/env.txt  (if it does not exist yet)
   Add all required variable assignments to that file.
 
 After any change, rebuild u-boot-imx:

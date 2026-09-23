@@ -1,19 +1,18 @@
-# swu_env.txt injection into the U-Boot board default environment.
+# swu-env.txt injection into the U-Boot board default environment.
 #
-# File layout under files/swu_env/:
+# File layout under files/swu-env/:
 #   env.txt                -- common variables for ALL machines (LOW priority)
 #   <MACHINE>/env.txt      -- machine-specific variables (HIGH priority, optional)
 #
 # Priority: MACHINE-SPECIFIC > COMMON.
 #
-# Yocto FILESEXTRAPATHS searches directories from left to right, stopping at
-# the first match.  The order below puts the machine-specific directory first,
-# so <MACHINE>/env.txt shadows env.txt when both exist:
-#   1. files/swu_env/<MACHINE>/env.txt  (machine-specific, higher priority)
-#   2. files/swu_env/env.txt            (common fallback)
+# Yocto automatically searches <dir>/<MACHINE>/ before <dir>/ for each entry
+# in FILESEXTRAPATHS, so the resolution of "file://env.txt" is:
+#   1. files/swu-env/<MACHINE>/env.txt  (machine-specific, higher priority)
+#   2. files/swu-env/env.txt            (common fallback)
 #
 # To override a common variable for one machine, create:
-#   files/swu_env/<MACHINE>/env.txt
+#   files/swu-env/<MACHINE>/env.txt
 # The common env.txt is only used when no machine-specific file is found.
 #
 # Injection method:
@@ -26,7 +25,7 @@
 #   files/board-env/<MACHINE>/<sys_board>.env
 #   If the U-Boot source tree has no matching .env file, the overlay is
 #   copied into ${S}/board/<sys_vendor>/<sys_board>/ before injection.
-FILESEXTRAPATHS:prepend := "${THISDIR}/files/swu_env/${MACHINE}:${THISDIR}/files/swu_env:${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files/swu-env:${THISDIR}/files:"
 
 # Directory containing board .env overlays for boards that lack one in the
 # U-Boot source tree.  Layout: <dir>/<MACHINE>/<sys_board>.env
@@ -39,6 +38,23 @@ SRC_URI += "file://env.txt"
 # already adds ${PN}-env to PACKAGES. Repeating it causes a QA error:
 #   "u-boot-imx-env is listed in PACKAGES multiple times"
 RPROVIDES:${PN}-env += "u-boot-default-env"
+
+# Install the final .config (after Kconfig injection) into datadir so that
+# libubootenv can read CONFIG_ENV_OFFSET and CONFIG_ENV_SIZE from the staging
+# sysroot, without searching the build work tree at install time.
+# The file is staged via the -dev package and consumed by libubootenv DEPENDS.
+do_install:append() {
+    dot_config="${B}/${UBOOT_CONFIG_BASENAME}_defconfig/.config"
+    if [ -f "${dot_config}" ]; then
+        install -d "${D}${datadir}/u-boot"
+        install -m 644 "${dot_config}" "${D}${datadir}/u-boot/${UBOOT_CONFIG_BASENAME}.config"
+        bbnote "u-boot-imx: staged ${dot_config} -> ${D}${datadir}/u-boot/${UBOOT_CONFIG_BASENAME}.config"
+    else
+        bbwarn "u-boot-imx: .config not found at ${dot_config}, skipping datadir install"
+    fi
+}
+
+FILES:${PN}-dev += "${datadir}/u-boot"
 
 do_configure:append() {
     # Inject SWUpdate-required Kconfig options into the generated .config.
