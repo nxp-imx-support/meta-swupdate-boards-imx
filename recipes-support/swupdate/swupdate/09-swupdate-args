@@ -16,7 +16,9 @@ fi
 if [ "$state" = "1" ];then
 	SWUPDATE_SURICATTA_ARGS="-c 2"
 else
-	SWUPDATE_SURICATTA_ARGS=" "
+	# Empty string: swupdate.sh only passes -u when this is non-empty.
+	# A single space would trigger suricatta with no args, causing a crash.
+	SWUPDATE_SURICATTA_ARGS=""
 fi
 
 if [ -e /media/etc/swupdate.cfg ];then
@@ -26,3 +28,9 @@ else
 fi
 
 SWUPDATE_ARGS="-H @MACHINE@:1.0 ${selection} -p 'reboot' -f ${CFGFILE}"
+
+# Enable the embedded webserver. swupdate.sh passes -w "$SWUPDATE_WEBSERVER_ARGS"
+# only when this variable is non-empty. Port and document_root are taken from
+# the webserver{} block in swupdate.cfg; the value here is an extra mongoose
+# option string passed verbatim after -w.
+SWUPDATE_WEBSERVER_ARGS="port=8080"
