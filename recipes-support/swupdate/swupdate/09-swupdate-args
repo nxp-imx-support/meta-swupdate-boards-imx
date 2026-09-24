@@ -8,18 +8,9 @@ else
 	selection="-e stable,copy2"
 fi
 
-state=`fw_printenv ustate | cut -f 2 -d'='`
-if [ -z "$state" ];then
-	fw_setenv ustate 1
-	state=`fw_printenv ustate | cut -f 2 -d'='`
-fi
-if [ "$state" = "1" ];then
-	SWUPDATE_SURICATTA_ARGS="-c 2"
-else
-	# Empty string: swupdate.sh only passes -u when this is non-empty.
-	# A single space would trigger suricatta with no args, causing a crash.
-	SWUPDATE_SURICATTA_ARGS=""
-fi
+# Suricatta (hawkbit) is disabled: no server URL is configured.
+# Leave SWUPDATE_SURICATTA_ARGS empty so swupdate.sh does not pass -u at all.
+SWUPDATE_SURICATTA_ARGS=""
 
 if [ -e /media/etc/swupdate.cfg ];then
 	CFGFILE="/media/etc/swupdate.cfg"
