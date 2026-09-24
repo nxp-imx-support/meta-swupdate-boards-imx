@@ -18,8 +18,8 @@ software =
 						installed-directly = true;
 					},
 					{
-						filename = "imx-boot-@@MACHINE@@-sd.bin-flash_singleboot";
-						sha256 = "$swupdate_get_sha256(imx-boot-@@MACHINE@@-sd.bin-flash_singleboot)";
+						filename = "imx-boot";
+						sha256 = "$swupdate_get_sha256(imx-boot)";
 						type = "raw";
 						device = "/dev/mmcblk0";
 						offset = "32K";
@@ -57,8 +57,8 @@ software =
 						installed-directly = true;
 					},
 					{
-						filename = "imx-boot-@@MACHINE@@-sd.bin-flash_singleboot";
-						sha256 = "$swupdate_get_sha256(imx-boot-@@MACHINE@@-sd.bin-flash_singleboot)";
+						filename = "imx-boot";
+						sha256 = "$swupdate_get_sha256(imx-boot)";
 						type = "raw";
 						device = "/dev/mmcblk0";
 						offset = "32K";

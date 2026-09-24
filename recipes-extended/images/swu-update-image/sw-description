@@ -6,80 +6,82 @@ software =
 	@@MACHINE@@ = {
 		hardware-compatibility: [ "1.0", "1.2", "1.3"];
 		stable : {
+			/* copy1: running from Slot A (mmcblk0p2), update Slot B (mmcblk0p4) */
 			copy1 : {
 				images: (
 					{
-						filename = "@@ROOTFS_IMAGE@@-@@MACHINE@@.ext4";
-						sha256 = "$swupdate_get_sha256(@@ROOTFS_IMAGE@@-@@MACHINE@@.ext4)";
+						filename = "@@ROOTFS_IMAGE@@-@@MACHINE@@.rootfs.ext4.gz";
+						sha256 = "$swupdate_get_sha256(@@ROOTFS_IMAGE@@-@@MACHINE@@.rootfs.ext4.gz)";
 						type = "raw";
 						compressed = "zlib";
 						device = "/dev/mmcblk0p4";
 						installed-directly = true;
 					},
 					{
-						filename = "imx-boot-@@MACHINE@@-sd.bin-flash_singleboot";
-						sha256 = "$swupdate_get_sha256(imx-boot-@@MACHINE@@-sd.bin-flash_singleboot)";
+						filename = "imx-boot";
+						sha256 = "$swupdate_get_sha256(imx-boot)";
 						type = "raw";
-						compressed = "zlib";
 						device = "/dev/mmcblk0";
 						offset = "32K";
 						installed-directly = true;
 					}
 				);
-				scripts: (
-					{
-						filename = "emmcsetup.lua";
-						type = "lua";
-					}
+			scripts: (
+				{
+					filename = "emmcsetup.lua";
+					type = "lua";
+					sha256 = "$swupdate_get_sha256(emmcsetup.lua)";
+				}
 
-				);
-				bootenv: (
-					{
-						name = "upgrade_available";
-						value = "1";
-					},
-					{
-						name = "bootslot";
-						value = "dualB";
-					}
+			);
+			bootenv: (
+				{
+					name = "upgrade_available";
+					value = "1";
+				},
+				{
+					name = "bootslot";
+					value = "dualB";
+				}
 				);
 			}
+			/* copy2: running from Slot B (mmcblk0p4), update Slot A (mmcblk0p2) */
 			copy2 : {
 				images: (
 					{
-						filename = "@@ROOTFS_IMAGE@@-@@MACHINE@@.ext4";
-						sha256 = "$swupdate_get_sha256(@@ROOTFS_IMAGE@@-@@MACHINE@@.ext4)";
+						filename = "@@ROOTFS_IMAGE@@-@@MACHINE@@.rootfs.ext4.gz";
+						sha256 = "$swupdate_get_sha256(@@ROOTFS_IMAGE@@-@@MACHINE@@.rootfs.ext4.gz)";
 						type = "raw";
 						compressed = "zlib";
-						device = "/dev/mmcblk0p3";
+						device = "/dev/mmcblk0p2";
 						installed-directly = true;
 					},
 					{
-						filename = "imx-boot-@@MACHINE@@-sd.bin-flash_singleboot";
-						sha256 = "$swupdate_get_sha256(imx-boot-@@MACHINE@@-sd.bin-flash_singleboot)";
+						filename = "imx-boot";
+						sha256 = "$swupdate_get_sha256(imx-boot)";
 						type = "raw";
-						compressed = "zlib";
 						device = "/dev/mmcblk0";
 						offset = "32K";
 						installed-directly = true;
 					}
 				);
-				scripts: (
-					{
-						filename = "emmcsetup.lua";
-						type = "lua";
-					}
+			scripts: (
+				{
+					filename = "emmcsetup.lua";
+					type = "lua";
+					sha256 = "$swupdate_get_sha256(emmcsetup.lua)";
+				}
 
-				);
-				bootenv: (
-					{
-						name = "upgrade_available";
-						value = "1";
-					},
-					{
-						name = "bootslot";
-						value = "dualA";
-					}
+			);
+			bootenv: (
+				{
+					name = "upgrade_available";
+					value = "1";
+				},
+				{
+					name = "bootslot";
+					value = "dualA";
+				}
 				);
 			}
 		}

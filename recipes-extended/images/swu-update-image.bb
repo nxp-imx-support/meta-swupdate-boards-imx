@@ -29,8 +29,13 @@ ROOTFS_IMAGE = "core-image-base"
 IMAGE_DEPENDS = "${ROOTFS_IMAGE}"
 
 # Images and files that will be included in the .swu archive.
-SWUPDATE_IMAGES = "${ROOTFS_IMAGE} imx-boot-${MACHINE}-sd.bin-flash_singleboot"
+SWUPDATE_IMAGES = "${ROOTFS_IMAGE} imx-boot"
 
-# varflag keys do not support variable expansion in BitBake, so this line
+# varflag keys do not support variable expansion in BitBake, so these lines
 # must use the literal recipe name that matches ROOTFS_IMAGE above.
 SWUPDATE_IMAGES_FSTYPES[core-image-base] = ".rootfs.ext4.gz"
+
+# imx-boot is deployed as a plain "imx-boot" symlink (no MACHINE suffix).
+# Setting NOAPPEND_MACHINE to "1" tells the bbclass to search for "imx-boot"
+# instead of "imx-boot-<MACHINE>".  No fstype entry needed for a binary file.
+SWUPDATE_IMAGES_NOAPPEND_MACHINE[imx-boot] = "1"
