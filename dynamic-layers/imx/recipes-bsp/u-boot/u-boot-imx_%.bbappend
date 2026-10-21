@@ -66,7 +66,10 @@ do_configure:append() {
         env_offset=$(grep -m1 '^CONFIG_ENV_OFFSET=' "${dot_config_kconfig}" | sed 's/CONFIG_ENV_OFFSET=//; s/0x//; s/"//g')
         env_size=$(grep -m1 '^CONFIG_ENV_SIZE=' "${dot_config_kconfig}" | sed 's/CONFIG_ENV_SIZE=//; s/0x//; s/"//g')
         if [ -n "${env_offset}" ] && [ -n "${env_size}" ]; then
-            redund_offset=$(awk 'BEGIN { printf "0x%X\n", strtonum("0x'"${env_offset}"'") + strtonum("0x'"${env_size}"'") }')
+            # Portable hex math (no gawk-only strtonum).
+            off_dec=$(printf '%d' "0x${env_offset}")
+            size_dec=$(printf '%d' "0x${env_size}")
+            redund_offset=$(awk -v a="${off_dec}" -v b="${size_dec}" 'BEGIN { printf "0x%X", a + b }')
             bbnote "u-boot-imx: CONFIG_ENV_OFFSET=0x${env_offset} + CONFIG_ENV_SIZE=0x${env_size} -> CONFIG_ENV_OFFSET_REDUND=${redund_offset}"
         else
             bbwarn "u-boot-imx: could not read CONFIG_ENV_OFFSET or CONFIG_ENV_SIZE, skipping redundant env config"
