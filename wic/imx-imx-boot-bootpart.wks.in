@@ -22,7 +22,7 @@
 #
 part u-boot --source rawcopy --sourceparams="file=imx-boot.tagged" --ondisk mmcblk --no-table --align ${IMX_BOOT_SEEK}
 # 8MB ~ 50MB
-part kernel --source rawcopy --sourceparams="file=Image" --ondisk mmcblk --no-table --align 8192
+part kernel --source rawcopy --sourceparams="file=${KERNEL_IMAGETYPE}" --ondisk mmcblk --no-table --align 8192
 # 50MB ~ 54MB
 part dtb --source rawcopy --sourceparams="file=${KERNEL_DEVICETREE_BASENAME}.dtb" --ondisk mmcblk --no-table --align 51200
 # 54MB ~ 120MB
@@ -32,7 +32,7 @@ part /boot_a --source bootimg-partition --ondisk mmcblk --fstype=vfat --label bo
 # Slot A RootFS: 376 MiB ~ (376 + ROOTFS_PART_SIZE) MiB
 part / --source rootfs --ondisk mmcblk --fstype=ext4 --label rootfs_a --align 385024 --fixed-size ${ROOTFS_PART_SIZE}
 # Slot B Boot: (376 + ROOTFS_PART_SIZE) MiB ~ (632 + ROOTFS_PART_SIZE) MiB
-part /boot_b --source bootimg-partition --ondisk mmcblk --fstype=vfat --label boot_b --active --align ${@(376 + int(d.getVar('ROOTFS_PART_SIZE'))) * 1024} --fixed-size 256
+part /boot_b --source bootimg-partition --ondisk mmcblk --fstype=vfat --label boot_b --align ${@(376 + int(d.getVar('ROOTFS_PART_SIZE'))) * 1024} --fixed-size 256
 # Slot B RootFS: (632 + ROOTFS_PART_SIZE) MiB ~ (632 + 2*ROOTFS_PART_SIZE) MiB
 part /rootfs_b --source rootfs --ondisk mmcblk --fstype=ext4 --label rootfs_b --align ${@(632 + int(d.getVar('ROOTFS_PART_SIZE'))) * 1024} --fixed-size ${ROOTFS_PART_SIZE}
 
