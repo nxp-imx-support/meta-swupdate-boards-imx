@@ -21,28 +21,27 @@ software =
 						filename = "imx-boot";
 						sha256 = "$swupdate_get_sha256(imx-boot)";
 						type = "raw";
-						device = "/dev/mmcblk0";
-						offset = "32K";
+						device = "@@SWU_BOOTPART_DEV@@";
+						offset = "@@SWU_BOOTPART_OFFSET@@";
 						installed-directly = true;
 					}
 				);
-			scripts: (
-				{
-					filename = "emmcsetup.lua";
-					type = "lua";
-					sha256 = "$swupdate_get_sha256(emmcsetup.lua)";
-				}
-
-			);
-			bootenv: (
-				{
-					name = "upgrade_available";
-					value = "1";
-				},
-				{
-					name = "bootslot";
-					value = "dualB";
-				}
+				scripts: (
+					{
+						filename = "emmcsetup.lua";
+						type = "lua";
+						sha256 = "$swupdate_get_sha256(emmcsetup.lua)";
+					}
+				);
+				bootenv: (
+					{
+						name = "upgrade_available";
+						value = "1";
+					},
+					{
+						name = "bootslot";
+						value = "dualB";
+					}
 				);
 			}
 			/* copy2: running from Slot B (mmcblk0p4), update Slot A (mmcblk0p2) */
@@ -60,28 +59,27 @@ software =
 						filename = "imx-boot";
 						sha256 = "$swupdate_get_sha256(imx-boot)";
 						type = "raw";
-						device = "/dev/mmcblk0";
-						offset = "32K";
+						device = "@@SWU_BOOTPART_DEV@@";
+						offset = "@@SWU_BOOTPART_OFFSET@@";
 						installed-directly = true;
 					}
 				);
-			scripts: (
-				{
-					filename = "emmcsetup.lua";
-					type = "lua";
-					sha256 = "$swupdate_get_sha256(emmcsetup.lua)";
-				}
-
-			);
-			bootenv: (
-				{
-					name = "upgrade_available";
-					value = "1";
-				},
-				{
-					name = "bootslot";
-					value = "dualA";
-				}
+				scripts: (
+					{
+						filename = "emmcsetup.lua";
+						type = "lua";
+						sha256 = "$swupdate_get_sha256(emmcsetup.lua)";
+					}
+				);
+				bootenv: (
+					{
+						name = "upgrade_available";
+						value = "1";
+					},
+					{
+						name = "bootslot";
+						value = "dualA";
+					}
 				);
 			}
 		}
