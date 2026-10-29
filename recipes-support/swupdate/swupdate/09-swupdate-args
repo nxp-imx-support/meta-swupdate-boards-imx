@@ -21,7 +21,7 @@ fi
 SWUPDATE_ARGS="-H @MACHINE@:1.0 ${selection} -p 'reboot' -f ${CFGFILE}"
 
 # Enable the embedded webserver. swupdate.sh passes -w "$SWUPDATE_WEBSERVER_ARGS"
-# only when this variable is non-empty. Port and document_root are taken from
-# the webserver{} block in swupdate.cfg; the value here is an extra mongoose
-# option string passed verbatim after -w.
-SWUPDATE_WEBSERVER_ARGS="port=8080"
+# only when this variable is non-empty. The value is a mongoose command-line
+# string: -r <document_root> -p <port>. Keep it consistent with the
+# webserver{} block in swupdate.cfg.
+SWUPDATE_WEBSERVER_ARGS="-r /www -p 8080"
