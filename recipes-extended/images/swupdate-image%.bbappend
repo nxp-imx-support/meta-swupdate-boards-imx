@@ -13,6 +13,8 @@ IMAGE_INSTALL = "base-files \
 		lua \
 		 "
 
-IMAGE_FSTYPES = "ext4.gz.u-boot ext4 cpio.gz.u-boot"
+# Only the U-Boot wrapped cpio is used: the wks file raw-copies
+# swupdate-image-${MACHINE}.rootfs.cpio.gz.u-boot to the ramdisk area.
+IMAGE_FSTYPES = "cpio.gz.u-boot"
 
-PACKAGE_EXCLUDE += " jailhouse kernel-module-jailhouse libncursesw5 libpanelw5 libpython3 python3*  perl* apt dpkg "
+PACKAGE_EXCLUDE += "jailhouse kernel-module-jailhouse libncursesw5 libpanelw5 libpython3 python3* perl* apt dpkg"
