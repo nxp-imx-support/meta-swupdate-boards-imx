@@ -2,6 +2,9 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/${PN}:"
 
 PACKAGECONFIG_CONFARGS = ""
 
+# 09-swupdate-args has MACHINE substituted in, so the package is machine specific.
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 SRC_URI += " \
     file://09-swupdate-args \
     file://swupdate-sysrestart.service \

@@ -19,6 +19,13 @@
 # Override FW_ENV_DEV if the eMMC device is not /dev/mmcblk0.
 FW_ENV_DEV ?= "/dev/mmcblk0"
 
+# Board revision written to /etc/hwrevision; must match hardware-compatibility
+# in sw-description.
+SWU_HW_REV ?= "1.0"
+
+# fw_env.config and hwrevision are machine specific.
+PACKAGE_ARCH:class-target = "${MACHINE_ARCH}"
+
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI:append:class-target = " file://fw_env.config"
@@ -59,7 +66,10 @@ do_install:append:class-target() {
         return
     fi
 
-    redund_offset=$(awk 'BEGIN { printf "0x%X\n", strtonum("0x'"${env_offset}"'") + strtonum("0x'"${env_size}"'") }')
+    # Portable hex math (no gawk-only strtonum).
+    off_dec=$(printf '%d' "0x${env_offset}")
+    size_dec=$(printf '%d' "0x${env_size}")
+    redund_offset=$(awk -v a="${off_dec}" -v b="${size_dec}" 'BEGIN { printf "0x%X", a + b }')
 
     printf '%s\t0x%s\t0x%s\n' "${FW_ENV_DEV}" "${env_offset}" "${env_size}"   > ${D}${sysconfdir}/fw_env.config
     printf '%s\t%s\t0x%s\n'   "${FW_ENV_DEV}" "${redund_offset}" "${env_size}" >> ${D}${sysconfdir}/fw_env.config
