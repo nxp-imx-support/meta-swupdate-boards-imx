@@ -35,20 +35,20 @@ SRC_URI = "\
 "
 
 # The rootfs image recipe to package into the .swu file.
-# @@ROOTFS_IMAGE@@ in sw-description is substituted with this value by the
+# @@SWUPDATE_ROOTFS_IMAGE@@ in sw-description is substituted with this value by the
 # swupdate bbclass via swupdate_expand_bitbake_variables().
-# Changing ROOTFS_IMAGE here is the only edit needed when switching the rootfs.
-ROOTFS_IMAGE = "core-image-base"
+# Changing SWUPDATE_ROOTFS_IMAGE here is the only edit needed when switching the rootfs.
+SWUPDATE_ROOTFS_IMAGE ?= "core-image-base"
 
 # IMAGE_DEPENDS is consumed by swupdate_getdepends() to add do_build
 # dependencies, so it must list the rootfs image recipe.
-IMAGE_DEPENDS = "${ROOTFS_IMAGE}"
+IMAGE_DEPENDS = "${SWUPDATE_ROOTFS_IMAGE}"
 
 # Images and files that will be included in the .swu archive.
-SWUPDATE_IMAGES = "${ROOTFS_IMAGE} imx-boot"
+SWUPDATE_IMAGES = "${SWUPDATE_ROOTFS_IMAGE} imx-boot"
 
 # varflag keys do not support variable expansion in BitBake, so these lines
-# must use the literal recipe name that matches ROOTFS_IMAGE above.
+# must use the literal recipe name that matches SWUPDATE_ROOTFS_IMAGE above.
 SWUPDATE_IMAGES_FSTYPES[core-image-base] = ".rootfs.ext4.gz"
 
 # imx-boot is deployed as a plain "imx-boot" symlink (no MACHINE suffix).
@@ -74,7 +74,7 @@ def get_swu_bootpart_offset(d):
     dev = d.getVar('SWU_BOOTPART_DEV') or ""
     seek = d.getVar('IMX_BOOT_SEEK') or "1"
 
-	# boot from emmc boot partition, return 0K for iMX9, iMX8MP, iMX8MN, iMX8QXP, iMX8QM, IMX8ULP
+    # boot from emmc boot partition, return 0K for iMX9, iMX8MP, iMX8MN, iMX8QXP, iMX8QM, IMX8ULP
     if re.search(r"mmcblk\d+boot\d+$", dev) and seek == "32":
         return "0K"
 
