@@ -10,7 +10,6 @@ SRC_URI += " \
     file://swupdate-sysrestart.service \
     file://swupdate.cfg \
     file://swu_public.pem \
-    file://0001-mongoose-enable-cgi.patch \
     file://sysinfo.cgi \
 "
 
