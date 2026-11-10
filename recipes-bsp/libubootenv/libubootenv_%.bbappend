@@ -11,17 +11,17 @@
 # That file is staged into the sysroot via the u-boot-imx-dev package and
 # is available at ${STAGING_DATADIR}/u-boot/ during libubootenv do_install.
 #
-#   line 1: <FW_ENV_DEV>  <ENV_OFFSET>          <ENV_SIZE>
-#   line 2: <FW_ENV_DEV>  <ENV_OFFSET+ENV_SIZE>  <ENV_SIZE>  (redundant copy)
+#   line 1: <SWUPDATE_FW_ENV_DEV>  <ENV_OFFSET>          <ENV_SIZE>
+#   line 2: <SWUPDATE_FW_ENV_DEV>  <ENV_OFFSET+ENV_SIZE>  <ENV_SIZE>  (redundant copy)
 #
 # To provide a hand-crafted fw_env.config for a machine, add content to:
 #   files/<MACHINE>/fw_env.config
-# Override FW_ENV_DEV if the eMMC device is not /dev/mmcblk0.
-FW_ENV_DEV ?= "/dev/mmcblk0"
+# Override SWUPDATE_FW_ENV_DEV if the eMMC device is not /dev/mmcblk0.
+SWUPDATE_FW_ENV_DEV ?= "/dev/mmcblk0"
 
 # Board revision written to /etc/hwrevision; must match hardware-compatibility
 # in sw-description.
-SWU_HW_REV ?= "1.0"
+SWUDPATE_HW_REV ?= "1.0"
 
 # fw_env.config and hwrevision are machine specific.
 PACKAGE_ARCH:class-target = "${MACHINE_ARCH}"
@@ -35,7 +35,7 @@ SRC_URI:append:class-target = " file://fw_env.config"
 DEPENDS:append:class-target = " virtual/bootloader"
 
 do_install:append:class-target() {
-    echo "${MACHINE} ${SWU_HW_REV}" > ${WORKDIR}/hwrevision
+    echo "${MACHINE} ${SWUDPATE_HW_REV}" > ${WORKDIR}/hwrevision
     install -d ${D}${sysconfdir}
     install -m 644 ${WORKDIR}/hwrevision ${D}${sysconfdir}
 
@@ -71,8 +71,8 @@ do_install:append:class-target() {
     size_dec=$(printf '%d' "0x${env_size}")
     redund_offset=$(awk -v a="${off_dec}" -v b="${size_dec}" 'BEGIN { printf "0x%X", a + b }')
 
-    printf '%s\t0x%s\t0x%s\n' "${FW_ENV_DEV}" "${env_offset}" "${env_size}"   > ${D}${sysconfdir}/fw_env.config
-    printf '%s\t%s\t0x%s\n'   "${FW_ENV_DEV}" "${redund_offset}" "${env_size}" >> ${D}${sysconfdir}/fw_env.config
+    printf '%s\t0x%s\t0x%s\n' "${SWUPDATE_FW_ENV_DEV}" "${env_offset}" "${env_size}"   > ${D}${sysconfdir}/fw_env.config
+    printf '%s\t%s\t0x%s\n'   "${SWUPDATE_FW_ENV_DEV}" "${redund_offset}" "${env_size}" >> ${D}${sysconfdir}/fw_env.config
 
     bbnote "libubootenv: auto-generated fw_env.config from ${staged_config}: offset=0x${env_offset} size=0x${env_size} redund=${redund_offset}"
 }
