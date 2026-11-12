@@ -49,7 +49,14 @@ SWUPDATE_IMAGES = "${SWUPDATE_ROOTFS_IMAGE} imx-boot"
 
 # varflag keys do not support variable expansion in BitBake, so these lines
 # must use the literal recipe name that matches SWUPDATE_ROOTFS_IMAGE above.
-SWUPDATE_IMAGES_FSTYPES[core-image-base] = ".rootfs.ext4.gz"
+#SWUPDATE_IMAGES_FSTYPES[core-image-base] = ".rootfs.ext4.gz"
+# Use __anonymous function to create varflag in runtime
+python __anonymous() {
+    img = d.getVar("SWUPDATE_ROOTFS_IMAGE")
+    d.setVarFlag("SWUPDATE_IMAGES_FSTYPES",
+                 img,
+                 ".rootfs.ext4.gz")
+}
 
 # imx-boot is deployed as a plain "imx-boot" symlink (no MACHINE suffix).
 # Setting NOAPPEND_MACHINE to "1" tells the bbclass to search for "imx-boot"
