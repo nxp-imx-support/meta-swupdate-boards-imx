@@ -1,0 +1,35 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "spdxVersion": "SPDX-2.3",
+  "creationInfo": {
+    "created": "2026-11-12T10:08:33Z",
+    "creators": [
+      "Organization: NXP"
+    ],
+    "licenseListVersion": "3.28"
+  },
+  "name": "META_SWU_BRDS_IMX-1.0",
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://nxp.com/spdx/d45c34f9-9876-4031-87fb-2a1fae41c838",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-package-d45c34f9-9876-4031-87fb-2a1fae41c838",
+      "name": "META_SWU_BRDS_IMX",
+      "versionInfo": "1.0",
+      "licenseConcluded": "(MIT)",
+      "licenseDeclared": "(MIT)",
+      "downloadLocation": "NOASSERTION",
+      "originator": "Organization: META_SWU_BRDS_IMX",
+      "supplier": "NOASSERTION",
+      "externalRefs": [],
+      "filesAnalyzed": false
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-package-d45c34f9-9876-4031-87fb-2a1fae41c838"
+    }
+  ]
+}

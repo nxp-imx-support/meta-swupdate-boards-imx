@@ -1,9 +1,0 @@
-NXP Software Content Register
-
-Package:            meta-swupdate-boards-imx
-Version:            1.0
-Outgoing License:   LA_OPT_Online Code Hosting NXP_Software_License - v1.4 May 2025
-License File:       LICENSE.txt
-Description:  		Yocto layer for SWUpdate boards.
-Release Location:   https://github.com/nxp-imx-support/meta-swupdate-boards-imx
-Origin:             NXP (LA_OPT_Online Code Hosting NXP_Software_License - v1.4 May 2025)
