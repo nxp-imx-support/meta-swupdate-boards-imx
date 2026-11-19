@@ -14,10 +14,12 @@ inherit core-image
 SWUPDATE_DISK_PTABLE ?= "msdos"
 WKS_FILE = "${THISDIR}/../../wic/imx-imx-boot-bootpart.wks.in"
 
+SWUPDATE_ROOTFS_IMAGE ?= "core-image-base"
+
 # The wks file pulls imx-boot.tagged and the SWUpdate ramdisk from DEPLOY_DIR_IMAGE,
 # so make sure both are built before wic assembles the image.
 # (IMAGE_DEPENDS is only used by the swupdate class and has no effect here.)
-do_image_wic[depends] += "imx-boot:do_deploy swupdate-image:do_image_complete"
+do_image_wic[depends] += "${SWUPDATE_ROOTFS_IMAGE}:do_image_complete imx-boot:do_deploy swupdate-image:do_image_complete"
 
 
 IMAGE_FSTYPES += "wic wic.bmap"
@@ -25,19 +27,69 @@ IMAGE_FSTYPES += "wic wic.bmap"
 # Add extra space for wic image if needed
 IMAGE_ROOTFS_EXTRA_SPACE ?= "10240"
 
-# SWUPDATE_ROOTFS_PART_SIZE (MiB) for each rootfs slot, rounded up to a full GiB:
-#   ceil(IMAGE_ROOTFS_SIZE * IMAGE_OVERHEAD_FACTOR / 1 GiB) * 1024
-# Computed at parse time because the .wks.in template is expanded before
-# do_image_wic runs; setting it inside do_image_wic would be too late.
-# Set SWUPDATE_ROOTFS_PART_SIZE in local.conf to force a fixed size instead.
+#
+# Derive SWUPDATE_ROOTFS_PART_SIZE from the generated rootfs image.
+#
+# This calculation is intended for workflows where the target image
+# specified by SWUPDATE_ROOTFS_IMAGE has already been built, e.g.:
+#
+#   bitbake ${SWUPDATE_ROOTFS_IMAGE}
+#   bitbake swu-base-image
+#
+# The partition size is calculated from the actual ext4 image size
+# rather than IMAGE_ROOTFS_SIZE from this recipe, ensuring the A/B
+# rootfs slots are sized according to the image being deployed.
+#
+# Calculation:
+#
+#   partition_size =
+#       ceil(rootfs.ext4_size * 1.3 / 1 GiB) * 1024 MiB
+#
+# A 30% margin is added to accommodate future package growth and
+# filesystem overhead. The final result is rounded up to the next
+# GiB boundary.
+#
+# If SWUPDATE_ROOTFS_PART_SIZE is already defined (for example in
+# local.conf), the user-specified value takes precedence and no
+# automatic calculation is performed.
+#
 python () {
+    import os
     import math
+
     if d.getVar('SWUPDATE_ROOTFS_PART_SIZE'):
         return
-    rootfs_kib = int(d.getVar('IMAGE_ROOTFS_SIZE') or 0)
-    overhead = float(d.getVar('IMAGE_OVERHEAD_FACTOR') or 1.3)
-    gib_kib = 1024 * 1024
-    needed = max(int(math.ceil(rootfs_kib * overhead)), 1)
-    size_mib = int(math.ceil(needed / gib_kib)) * 1024
-    d.setVar('SWUPDATE_ROOTFS_PART_SIZE', str(size_mib))
+
+    image = d.getVar('SWUPDATE_ROOTFS_IMAGE')
+    machine = d.getVar('MACHINE')
+    deploy = d.getVar('DEPLOY_DIR_IMAGE')
+
+    ext4 = os.path.join(
+        deploy,
+        "%s-%s.rootfs.ext4" % (image, machine)
+    )
+
+    if not os.path.exists(ext4):
+        bb.warn(
+            "Unable to calculate SWUPDATE_ROOTFS_PART_SIZE because %s "
+            "does not exist. Build %s first or specify "
+            "SWUPDATE_ROOTFS_PART_SIZE manually."
+            % (ext4, image)
+        )
+        return
+
+    size_mib = math.ceil(
+        os.path.getsize(ext4) / 1024 / 1024
+    )
+
+    # Add 30% headroom.
+    size_mib = math.ceil(size_mib * 1.3)
+
+    # Round up to the next GiB.
+    size_mib = math.ceil(size_mib / 1024) * 1024
+
+    d.setVar(
+        'SWUPDATE_ROOTFS_PART_SIZE',
+        str(size_mib)
+    )
 }

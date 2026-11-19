@@ -30,10 +30,10 @@ part ramfs --source rawcopy --sourceparams="file=swupdate-image-${MACHINE}.rootf
 # Slot A Boot: 120 MiB ~ 376 MiB
 part /boot_a --source bootimg-partition --ondisk mmcblk --fstype=vfat --label boot_a --active --align 122880 --fixed-size 256
 # Slot A RootFS: 376 MiB ~ (376 + SWUPDATE_ROOTFS_PART_SIZE) MiB
-part / --source rootfs --ondisk mmcblk --fstype=ext4 --label rootfs_a --align 385024 --fixed-size ${SWUPDATE_ROOTFS_PART_SIZE}
+part / --source rawcopy --sourceparams="file=${SWUPDATE_ROOTFS_IMAGE}-${MACHINE}.rootfs.ext4" --ondisk mmcblk --fstype=ext4 --label rootfs_a --align 385024 --fixed-size ${SWUPDATE_ROOTFS_PART_SIZE}
 # Slot B Boot: (376 + SWUPDATE_ROOTFS_PART_SIZE) MiB ~ (632 + SWUPDATE_ROOTFS_PART_SIZE) MiB
 part /boot_b --source bootimg-partition --ondisk mmcblk --fstype=vfat --label boot_b --align ${@(376 + int(d.getVar('SWUPDATE_ROOTFS_PART_SIZE'))) * 1024} --fixed-size 256
 # Slot B RootFS: (632 + SWUPDATE_ROOTFS_PART_SIZE) MiB ~ (632 + 2*SWUPDATE_ROOTFS_PART_SIZE) MiB
-part /rootfs_b --source rootfs --ondisk mmcblk --fstype=ext4 --label rootfs_b --align ${@(632 + int(d.getVar('SWUPDATE_ROOTFS_PART_SIZE'))) * 1024} --fixed-size ${SWUPDATE_ROOTFS_PART_SIZE}
+part /rootfs_b --source rawcopy --sourceparams="file=${SWUPDATE_ROOTFS_IMAGE}-${MACHINE}.rootfs.ext4" --ondisk mmcblk --fstype=ext4 --label rootfs_b --align ${@(632 + int(d.getVar('SWUPDATE_ROOTFS_PART_SIZE'))) * 1024} --fixed-size ${SWUPDATE_ROOTFS_PART_SIZE}
 
 bootloader --ptable ${SWUPDATE_DISK_PTABLE}
