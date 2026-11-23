@@ -20,7 +20,7 @@ WKS_FILE = "${THISDIR}/../../wic/imx-imx-boot-bootpart.wks.in"
 # (IMAGE_DEPENDS is only used by the swupdate class and has no effect here.)
 do_image_wic[depends] += "${SWUPDATE_ROOTFS_IMAGE}:do_image_complete imx-boot:do_deploy swupdate-image:do_image_complete"
 
-IMAGE_FSTYPES += "wic wic.bmap"
+IMAGE_FSTYPES = "wic wic.bmap"
 
 # Add extra space for wic image if needed
 IMAGE_ROOTFS_EXTRA_SPACE ?= "10240"
