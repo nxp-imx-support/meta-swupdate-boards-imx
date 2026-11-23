@@ -21,8 +21,8 @@ software =
 						filename = "imx-boot";
 						sha256 = "$swupdate_get_sha256(imx-boot)";
 						type = "raw";
-						device = "@@SWU_BOOTPART_DEV@@";
-						offset = "@@SWU_BOOTPART_OFFSET@@";
+						device = "@@SWUPDATE_BOOTPART_DEV@@";
+						offset = "@@SWUPDATE_BOOTPART_OFFSET@@";
 						installed-directly = true;
 					}
 				);
@@ -59,8 +59,8 @@ software =
 						filename = "imx-boot";
 						sha256 = "$swupdate_get_sha256(imx-boot)";
 						type = "raw";
-						device = "@@SWU_BOOTPART_DEV@@";
-						offset = "@@SWU_BOOTPART_OFFSET@@";
+						device = "@@SWUPDATE_BOOTPART_DEV@@";
+						offset = "@@SWUPDATE_BOOTPART_OFFSET@@";
 						installed-directly = true;
 					}
 				);

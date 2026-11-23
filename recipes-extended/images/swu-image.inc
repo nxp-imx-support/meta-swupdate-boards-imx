@@ -14,12 +14,12 @@ SWUPDATE_ROOTFS_IMAGE ?= "core-image-base"
 #         i.MX 8M Nano, i.MX 8M Plus, i.MX 8ULP, i.MX 9
 # The BSP machine configs already set IMX_BOOT_SEEK (in KiB) to 32 or 33 per
 # the table above, so reuse it. i.MX 6/7 machines do not define it: use 1K.
-# Override SWU_BOOTPART_OFFSET in local.conf or a machine conf if needed.
-# Referenced in sw-description as @@SWU_BOOTPART_DEV@@ / @@SWU_BOOTPART_OFFSET@@.
+# Override SWUPDATE_BOOTPART_OFFSET in local.conf or a machine conf if needed.
+# Referenced in sw-description as @@SWUPDATE_BOOTPART_DEV@@ / @@SWUPDATE_BOOTPART_OFFSET@@.
 def get_swu_bootpart_offset(d):
     import re
 
-    dev = d.getVar('SWU_BOOTPART_DEV') or ""
+    dev = d.getVar('SWUPDATE_BOOTPART_DEV') or ""
     seek = d.getVar('IMX_BOOT_SEEK') or "1"
 
     # boot from emmc boot partition, return 0K for iMX9, iMX8MP, iMX8MN, iMX8QXP, iMX8QM, IMX8ULP

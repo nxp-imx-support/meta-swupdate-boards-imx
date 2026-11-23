@@ -58,5 +58,5 @@ python __anonymous() {
 # instead of "imx-boot-<MACHINE>".  No fstype entry needed for a binary file.
 SWUPDATE_IMAGES_NOAPPEND_MACHINE[imx-boot] = "1"
 
-SWU_BOOTPART_DEV ?= "/dev/mmcblk0boot0"
-SWU_BOOTPART_OFFSET ?= "${@get_swu_bootpart_offset(d)}"
+SWUPDATE_BOOTPART_DEV ?= "/dev/mmcblk0boot0"
+SWUPDATE_BOOTPART_OFFSET ?= "${@get_swu_bootpart_offset(d)}"
