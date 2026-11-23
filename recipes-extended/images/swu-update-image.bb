@@ -4,6 +4,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 inherit swupdate
+require swu-image.inc
 
 # Sign sw-description with RSA private key so swupdate can verify the package.
 # SWUPDATE_SIGNING = "RSA" causes the bbclass to run:
@@ -34,12 +35,6 @@ SRC_URI = "\
     file://sw-description \
 "
 
-# The rootfs image recipe to package into the .swu file.
-# @@SWUPDATE_ROOTFS_IMAGE@@ in sw-description is substituted with this value by the
-# swupdate bbclass via swupdate_expand_bitbake_variables().
-# Changing SWUPDATE_ROOTFS_IMAGE here is the only edit needed when switching the rootfs.
-SWUPDATE_ROOTFS_IMAGE ?= "core-image-base"
-
 # IMAGE_DEPENDS is consumed by swupdate_getdepends() to add do_build
 # dependencies, so it must list the rootfs image recipe.
 IMAGE_DEPENDS = "${SWUPDATE_ROOTFS_IMAGE}"
@@ -49,7 +44,7 @@ SWUPDATE_IMAGES = "${SWUPDATE_ROOTFS_IMAGE} imx-boot"
 
 # varflag keys do not support variable expansion in BitBake, so these lines
 # must use the literal recipe name that matches SWUPDATE_ROOTFS_IMAGE above.
-#SWUPDATE_IMAGES_FSTYPES[core-image-base] = ".rootfs.ext4.gz"
+#SWUPDATE_IMAGES_FSTYPES[${SWUPDATE_ROOTFS_IMAGE}] = ".rootfs.ext4.gz"
 # Use __anonymous function to create varflag in runtime
 python __anonymous() {
     img = d.getVar("SWUPDATE_ROOTFS_IMAGE")
@@ -62,30 +57,6 @@ python __anonymous() {
 # Setting NOAPPEND_MACHINE to "1" tells the bbclass to search for "imx-boot"
 # instead of "imx-boot-<MACHINE>".  No fstype entry needed for a binary file.
 SWUPDATE_IMAGES_NOAPPEND_MACHINE[imx-boot] = "1"
-
-# Bootloader target: eMMC boot0 hardware partition. emmcsetup.lua unlocks
-# force_ro in preinst and runs "mmc bootpart enable 1 1" in postinst so the
-# ROM boots from boot0. Bootloader offset by SoC:
-#   1K  - i.MX 6, i.MX 7
-#   33K - i.MX 8QuadMax A0, i.MX 8QuadXPlus A0, i.MX 8M Quad, i.MX 8M Mini
-#   32K for User partition and 0K for Boot partition - i.MX 8QuadXPlus B0,
-#         i.MX 8QuadMax B0, i.MX 8DualX, i.MX 8DXL,
-#         i.MX 8M Nano, i.MX 8M Plus, i.MX 8ULP, i.MX 9
-# The BSP machine configs already set IMX_BOOT_SEEK (in KiB) to 32 or 33 per
-# the table above, so reuse it. i.MX 6/7 machines do not define it: use 1K.
-# Override SWU_BOOTPART_OFFSET in local.conf or a machine conf if needed.
-# Referenced in sw-description as @@SWU_BOOTPART_DEV@@ / @@SWU_BOOTPART_OFFSET@@.
-def get_swu_bootpart_offset(d):
-    import re
-
-    dev = d.getVar('SWU_BOOTPART_DEV') or ""
-    seek = d.getVar('IMX_BOOT_SEEK') or "1"
-
-    # boot from emmc boot partition, return 0K for iMX9, iMX8MP, iMX8MN, iMX8QXP, iMX8QM, IMX8ULP
-    if re.search(r"mmcblk\d+boot\d+$", dev) and seek == "32":
-        return "0K"
-
-    return seek + "K"
 
 SWU_BOOTPART_DEV ?= "/dev/mmcblk0boot0"
 SWU_BOOTPART_OFFSET ?= "${@get_swu_bootpart_offset(d)}"

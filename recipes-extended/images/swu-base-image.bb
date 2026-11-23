@@ -4,6 +4,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 inherit core-image
+require swu-image.inc
 
 # Use the unified wic layout from this layer.
 # Partition table type is controlled by SWUPDATE_DISK_PTABLE:
@@ -14,13 +15,10 @@ inherit core-image
 SWUPDATE_DISK_PTABLE ?= "msdos"
 WKS_FILE = "${THISDIR}/../../wic/imx-imx-boot-bootpart.wks.in"
 
-SWUPDATE_ROOTFS_IMAGE ?= "core-image-base"
-
 # The wks file pulls imx-boot.tagged and the SWUpdate ramdisk from DEPLOY_DIR_IMAGE,
 # so make sure both are built before wic assembles the image.
 # (IMAGE_DEPENDS is only used by the swupdate class and has no effect here.)
 do_image_wic[depends] += "${SWUPDATE_ROOTFS_IMAGE}:do_image_complete imx-boot:do_deploy swupdate-image:do_image_complete"
-
 
 IMAGE_FSTYPES += "wic wic.bmap"
 
@@ -82,14 +80,11 @@ python () {
         os.path.getsize(ext4) / 1024 / 1024
     )
 
-    # Add 30% headroom.
+    # Add 30% growth margin.
     size_mib = math.ceil(size_mib * 1.3)
 
-    # Round up to the next GiB.
+    # Round up to a full GiB boundary.
     size_mib = math.ceil(size_mib / 1024) * 1024
 
-    d.setVar(
-        'SWUPDATE_ROOTFS_PART_SIZE',
-        str(size_mib)
-    )
+    d.setVar('SWUPDATE_ROOTFS_PART_SIZE', str(size_mib))
 }
